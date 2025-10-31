@@ -43,6 +43,11 @@ app.post("/api/braip/webhook", async (req, res) => {
   res.status(200).json({ success: true });
 });
 
+// Endpoint de saúde
+app.get('/saude', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date() });
+});
+
 app.get("/api/pagamentos", async (req, res) => {
   const dados = await fs.readJSON(DB_FILE);
   res.json(dados.reverse());
