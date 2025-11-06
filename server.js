@@ -1,38 +1,33 @@
-// server.js
 import express from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
-import path from "path";
-import { fileURLToPath } from "url";
-import braipRoutes from "./routes/braipRoutes.js";
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-// 🧰 Middlewares
-app.use(cors());
-app.use(express.json({ limit: "10mb" }));
-app.use(bodyParser.urlencoded({ extended: true }));
+// Middleware para interpretar JSON
+app.use(bodyParser.json());
 
-// ✅ Rota de saúde
+// Rota de teste de saúde
 app.get("/saude", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// ✅ Rota principal Braip
-app.use("/braip", braipRoutes);
-
-// 🧠 Captura qualquer rota inexistente (erro 404)
-app.use((req, res) => {
-  res.status(404).json({ error: `Rota não encontrada: ${req.originalUrl}` });
+// Rota de teste manual
+app.get("/braip/test", (req, res) => {
+  res.json({ message: "Rota de teste da Braip funcionando!" });
 });
 
-// 🚀 Porta dinâmica do Render
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+// Rota de webhook Braip
+app.post("/braip/webhook", (req, res) => {
+  console.log("🔔 Webhook recebido da Braip:", req.body);
+
+  // Resposta obrigatória para a Braip entender que deu certo
+  res.json({ message: "Webhook recebido com sucesso!" });
+});
+
+// Configuração da porta
+const port = process.env.PORT || 10000;
+
+// Escutar em 0.0.0.0 para Render funcionar corretamente
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Servidor rodando na porta ${port}`);
 });
