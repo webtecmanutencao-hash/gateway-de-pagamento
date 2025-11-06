@@ -1,33 +1,29 @@
 import express from "express";
 import bodyParser from "body-parser";
+import clientesRoutes from "./routes/clientesRoutes.js";
+import { handleWebhook } from "./controllers/braipController.js";
 
 const app = express();
-
-// Middleware para interpretar JSON
 app.use(bodyParser.json());
 
-// Rota de teste de saúde
+// Rota de saúde (teste rápido)
 app.get("/saude", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Rota de teste manual
+// Rota para listar clientes
+app.use("/clientes", clientesRoutes);
+
+// Teste manual
 app.get("/braip/test", (req, res) => {
   res.json({ message: "Rota de teste da Braip funcionando!" });
 });
 
-// Rota de webhook Braip
-app.post("/braip/webhook", (req, res) => {
-  console.log("🔔 Webhook recebido da Braip:", req.body);
+// Webhook Braip
+app.post("/braip/webhook", handleWebhook);
 
-  // Resposta obrigatória para a Braip entender que deu certo
-  res.json({ message: "Webhook recebido com sucesso!" });
-});
-
-// Configuração da porta
+// Porta configurada para Render
 const port = process.env.PORT || 10000;
-
-// Escutar em 0.0.0.0 para Render funcionar corretamente
 app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 Servidor rodando na porta ${port}`);
 });
